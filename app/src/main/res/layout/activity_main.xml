@@ -12,6 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:text="strat tracking location"
+        android:onClick="startTrackingOnClick"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -23,6 +24,7 @@
         android:layout_marginTop="16dp"
         android:text="stop tracking location"
         android:visibility="gone"
+        android:onClick="stopTrackingOnClick"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -33,7 +35,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:text="Longtitude: "
+        android:text="Longitude: "
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btn_start" />
 
@@ -63,6 +65,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:text="set location as home"
+        android:visibility="gone"
+        android:onClick="setAsHomeOnClick"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_accuracy" />
@@ -74,6 +78,19 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:text="Your home location: "
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btn_set_as_home" />
+
+    <Button
+        android:id="@+id/btn_clear_home"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="clear home"
+        android:visibility="gone"
+        android:onClick="clearHomeOnclick"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_home_location" />
 </androidx.constraintlayout.widget.ConstraintLayout>
