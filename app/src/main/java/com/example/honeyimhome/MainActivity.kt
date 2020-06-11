@@ -96,7 +96,7 @@ class MainActivity : AppCompatActivity() {
         }
         else{
             ActivityCompat.requestPermissions(this,
-                Array(1){"android.permission.ACCESS_FINE_LOCATION"}, LOCATION_REQUEST_CODE)
+                arrayOf("android.permission.ACCESS_FINE_LOCATION"), LOCATION_REQUEST_CODE)
         }
     }
 
