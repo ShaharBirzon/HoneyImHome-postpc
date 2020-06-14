@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -19,10 +20,12 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
     val LOCATION_REQUEST_CODE = 123
+    val SMS_REQUEST_CODE = 124
     private var locationTracker: LocationTracker? = null
     private val sp: HomeSharedPreferences = HomeSharedPreferences()
     private var homeLoc: LocationInfo? = null
     var broadcastReceiver: BroadcastReceiver? = null
+    private var inputPhone: String = ""
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,6 +64,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         registerReceiver(broadcastReceiver, IntentFilter("new_location"))
+
+        inputPhone = sp.getPhoneNumberFromMyPref(this).toString()
+        if (inputPhone != ""){
+            btn_test_sms.visibility = View.VISIBLE
+            et_phone_num.hint = inputPhone
+        }
 
     }
 
@@ -116,9 +125,16 @@ class MainActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
         if(grantResults[0] == PackageManager.PERMISSION_GRANTED){
-            locationTracker?.startTracking()
-            btn_start.visibility = View.INVISIBLE
-            btn_stop.visibility = View.VISIBLE
+            if(permissions[0] == "android.permission.SEND_SMS"){
+                et_phone_num.visibility = View.VISIBLE
+                btn_save_phone.visibility = View.VISIBLE
+            }
+            else{
+                locationTracker?.startTracking()
+                btn_start.visibility = View.INVISIBLE
+                btn_stop.visibility = View.VISIBLE
+            }
+
         }
         else{
             if(ActivityCompat.shouldShowRequestPermissionRationale(this, "android.permission.ACCESS_FINE_LOCATION")){
@@ -156,6 +172,38 @@ class MainActivity : AppCompatActivity() {
         sp.saveHomeLocationToMyPref(this, null)
         btn_clear_home.visibility = View.GONE
         tv_home_location.visibility = View.INVISIBLE
+    }
+
+    fun setSmsOnCLick(view: View){
+        val hasLocationPermission = ActivityCompat.checkSelfPermission(this,
+            "android.permission.SEND_SMS") == PackageManager.PERMISSION_GRANTED
+
+        if(hasLocationPermission){
+            et_phone_num.visibility = View.VISIBLE
+            btn_save_phone.visibility = View.VISIBLE
+        }
+        else{
+            ActivityCompat.requestPermissions(this,
+                arrayOf("android.permission.SEND_SMS"), SMS_REQUEST_CODE)
+        }
+    }
+
+    fun saveSmsNumOnClick(view: View){
+        inputPhone = et_phone_num.text.toString()
+        sp.savePhoneNumberToMYPref(this, inputPhone)
+        et_phone_num.visibility = View.GONE
+        btn_save_phone.visibility = View.GONE
+        Toast.makeText(this, "phone number saved", Toast.LENGTH_SHORT).show()
+        if (inputPhone != ""){
+            btn_test_sms.visibility = View.VISIBLE
+        }
+    }
+
+    fun testSmsOnClick(view: View){
+        var intent = Intent("send_sms")
+        intent.putExtra("phone", inputPhone)
+        intent.putExtra("content", "Honey I'm Sending a Test Message!")
+        sendBroadcast(intent)
     }
 
 

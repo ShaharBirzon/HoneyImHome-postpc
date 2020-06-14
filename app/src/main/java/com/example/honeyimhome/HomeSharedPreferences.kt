@@ -24,6 +24,24 @@ class HomeSharedPreferences {
         editor.apply()
     }
 
+    fun savePhoneNumberToMYPref(context: Context, phone: String){
+        val sharedPreferences: SharedPreferences = context.getSharedPreferences(
+            "shared preferences",
+            MODE_PRIVATE
+        )
+        val editor = sharedPreferences.edit()
+        editor.putString("phone", phone).apply()
+    }
+
+    fun getPhoneNumberFromMyPref(context: Context): String? {
+        val sharedPreferences: SharedPreferences = context.getSharedPreferences(
+            "shared preferences",
+            MODE_PRIVATE
+        )
+        return sharedPreferences.getString("phone", "")
+
+    }
+
     fun getHomeLocationFromMyPref(context: Context): LocationInfo? {
         val sharedPreferences: SharedPreferences = context.getSharedPreferences(
             "shared preferences",

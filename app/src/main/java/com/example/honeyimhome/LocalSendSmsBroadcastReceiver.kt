@@ -13,6 +13,7 @@ import android.telephony.SmsManager
 import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat.getSystemService
 
 class LocalSendSmsBroadcastReceiver (var context: Context?) : BroadcastReceiver() {
     val PHONE_KEY = "phone"
@@ -29,17 +30,17 @@ class LocalSendSmsBroadcastReceiver (var context: Context?) : BroadcastReceiver(
         }
         val phone = intent?.getStringExtra(PHONE_KEY)
         val content = intent?.getStringExtra(CONTENT_KEY)
-        if (phone == null || content == null) {
+        if (phone == null || content == null || phone == "") {
             Log.i("LocalSendSms", "error! can't find phone number or content")
         }
 
         val smsManager: SmsManager = SmsManager.getDefault()
         smsManager.sendTextMessage(phone, null, content, null, null)
-
+        fireNotification("sending sms to $phone")
     }
 
 
-    fun fireNotification(msg: String) {
+    private fun fireNotification(msg: String) {
         createChannelIfNotExists()
         actualFire(msg)
     }
@@ -47,8 +48,7 @@ class LocalSendSmsBroadcastReceiver (var context: Context?) : BroadcastReceiver(
 
     private fun createChannelIfNotExists() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val notificationManager =
-                context!!.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            val notificationManager = context!!.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
             notificationManager.notificationChannels.forEach { channel ->
                 if (channel.id == channelId) {
@@ -58,7 +58,7 @@ class LocalSendSmsBroadcastReceiver (var context: Context?) : BroadcastReceiver(
 
             // Create the NotificationChannel
             val name = "non-important"
-            val descriptionText = "channel forr non important notifications"
+            val descriptionText = "channel for non important notifications"
             val importance = NotificationManager.IMPORTANCE_DEFAULT
             val channel = NotificationChannel(channelId, name, importance)
             channel.description = descriptionText
@@ -71,10 +71,10 @@ class LocalSendSmsBroadcastReceiver (var context: Context?) : BroadcastReceiver(
 
     private fun actualFire(msg: String) {
 
-        val intentToOpenBlue = Intent(context, MainActivity::class.java)
-        intentToOpenBlue.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+        val intentForMain = Intent(context, MainActivity::class.java)
+        intentForMain.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
 
-        val pending = PendingIntent.getActivity(context, 123, intentToOpenBlue, 0)
+        val pending = PendingIntent.getActivity(context, 123, intentForMain, 0)
 
         var notification: Notification = NotificationCompat.Builder(context!!, channelId)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
@@ -83,10 +83,8 @@ class LocalSendSmsBroadcastReceiver (var context: Context?) : BroadcastReceiver(
             .setContentIntent(pending)
             .build()
 
-
         val notificationManager =
             context!!.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
 
         notificationManager.notify(123, notification)
 
