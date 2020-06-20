@@ -58,6 +58,9 @@ class MainActivity : AppCompatActivity() {
                     }
                     if(!intent.getBooleanExtra("to_stop",false)){
                         setCurrentLocTextViews(locationTracker!!.curLocationInfo)
+//                        if (context != null) {
+//                            sp.saveCurrentLocationToMyPref(context, locationTracker!!.curLocationInfo)
+//                        }
                     }
                 }
             }
@@ -84,8 +87,12 @@ class MainActivity : AppCompatActivity() {
     private fun setHomeLocTextView(locInfo: LocationInfo?){
         val homeLocTv : TextView = tv_home_location
         tv_home_location.visibility = View.VISIBLE
-        val homeLocStr : String =  "Your home location -\nLongitude: " + (locInfo?.longitude ?: "0") +
-                "\nLatitude: " + (locInfo?.latitude ?: "0") +"\nAccuracy: "+ (locInfo?.accuracy ?: "0" )
+        val long = locInfo?.longitude ?: 0.0
+        val lat = locInfo?.latitude ?: 0.0
+        val acc = locInfo?.accuracy ?: 0f
+        val homeLocStr : String =  "Your home location -\nLongitude: $long \n" +
+                "Latitude: $lat \n" +
+                "Accuracy: $acc"
         homeLocTv.text = homeLocStr
     }
 
@@ -152,7 +159,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun setAsHomeOnClick(view: View){
-        val curLoc : LocationInfo = locationTracker?.curLocationInfo ?: LocationInfo("0","0","0")
+        val curLoc : LocationInfo = locationTracker?.curLocationInfo ?: LocationInfo(0.0,0.0,0f)
         sp.saveHomeLocationToMyPref(this, curLoc)
         setHomeLocTextView(curLoc)
         btn_clear_home.visibility = View.VISIBLE
@@ -160,11 +167,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun setCurrentLocTextViews(curLoc: LocationInfo){
-        val curLongitude: String = "Longitude: "+ curLoc.longitude
+        val curLongitude: String = "Longitude: ${curLoc.longitude}"
         tv_longtitude.text = curLongitude
-        val curLat: String = "Latitude: "+ curLoc.latitude
+        val curLat: String = "Latitude: ${curLoc.latitude}"
         tv_latitude.text =  curLat
-        val curAccuracy: String = "Accuracy: "+ curLoc.accuracy
+        val curAccuracy: String = "Accuracy: ${curLoc.accuracy}"
         tv_accuracy.text = curAccuracy
     }
 

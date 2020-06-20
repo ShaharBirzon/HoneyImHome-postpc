@@ -7,24 +7,24 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
-import android.view.View
+import android.util.Log
 import androidx.core.app.ActivityCompat
-import java.util.jar.Manifest
 
 
-data class LocationInfo(var latitude: String, var longitude: String, var accuracy: String){}
+data class LocationInfo(var latitude: Double, var longitude: Double, var accuracy: Float){}
 
 class LocationTracker(var context: Context, var locationManager: LocationManager){
     val intent = Intent("new_location")
-    var curLocationInfo: LocationInfo = LocationInfo("0", "0", "0")
+    var curLocationInfo: LocationInfo = LocationInfo(0.0, 0.0, 0f)
     var locationListener: LocationListener = object : LocationListener{
         override fun onLocationChanged(location: Location?) {
+            Log.i("onLocationChanged", "loc changed")
             val longitude: Double = location?.longitude ?: 0.0
             val latitude: Double = location?.latitude ?: 0.0
             val accuracy: Float = location?.accuracy ?: 0f
-            curLocationInfo.longitude = longitude.toBigDecimal().toPlainString()
-            curLocationInfo.latitude = latitude.toBigDecimal().toPlainString()
-            curLocationInfo.accuracy = accuracy.toBigDecimal().toPlainString()
+            curLocationInfo.longitude = longitude
+            curLocationInfo.latitude = latitude
+            curLocationInfo.accuracy = accuracy
 
 
             if(accuracy<50){
@@ -35,6 +35,9 @@ class LocationTracker(var context: Context, var locationManager: LocationManager
             }
 
             context.sendBroadcast(intent)
+            val intent2 = Intent("got_location")
+            intent2.putExtra("ToWorker", true)
+            context.sendBroadcast(intent2)
         }
 
         override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {

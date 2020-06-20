@@ -24,6 +24,21 @@ class HomeSharedPreferences {
         editor.apply()
     }
 
+    fun saveCurrentLocationToMyPref(
+        context: Context,
+        locationInfo: LocationInfo?
+    ) {
+        val sharedPreferences: SharedPreferences = context.getSharedPreferences(
+            "shared preferences",
+            MODE_PRIVATE
+        )
+        val editor = sharedPreferences.edit()
+        val gson = Gson()
+        val json: String = gson.toJson(locationInfo)
+        editor.putString("curLocation", json)
+        editor.apply()
+    }
+
     fun savePhoneNumberToMYPref(context: Context, phone: String){
         val sharedPreferences: SharedPreferences = context.getSharedPreferences(
             "shared preferences",
@@ -49,6 +64,17 @@ class HomeSharedPreferences {
         )
         val gson = Gson()
         val json = sharedPreferences.getString("homeLocation", null) ?: return null
+        val type: Type = object : TypeToken<LocationInfo?>() {}.type
+        return gson.fromJson(json, type)
+    }
+
+    fun getCurrentLocationFromMyPref(context: Context): LocationInfo? {
+        val sharedPreferences: SharedPreferences = context.getSharedPreferences(
+            "shared preferences",
+            MODE_PRIVATE
+        )
+        val gson = Gson()
+        val json = sharedPreferences.getString("curLocation", null) ?: return null
         val type: Type = object : TypeToken<LocationInfo?>() {}.type
         return gson.fromJson(json, type)
     }
